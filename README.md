@@ -11,7 +11,7 @@ To use SimpleRouter, simply include the `Router.php` file in your PHP project an
 require_once 'Router.php';
 ```
 
-## Usage Example
+## Example Usage
 
 ### Initial Setup
 
@@ -21,9 +21,9 @@ use SimpleRouter\Application\Router;
 $router = new Router();
 ```
 
-### Route Definition
+### Defining Routes
 
-#### GET and POST Routes
+#### Basic Routes
 
 ```php
 $router->get('/', function($request) {
@@ -33,12 +33,20 @@ $router->get('/', function($request) {
 $router->post('/post', [MyController::class, 'postMethod']);
 ```
 
-#### Defining a Route Group
+#### Route Groups and Subgroups
 
 ```php
 $router->group('/api', function() use ($router) {
-    $router->get('/users', [UserController::class, 'getAll']);
-    $router->post('/users', [UserController::class, 'create']);
+    // Subgroup '/v2'
+    $router->subgroup('/v2', function() use ($router) {
+        $router->get('/users', [UserController::class, 'getAll']);
+        $router->post('/users', [UserController::class, 'create']);
+    });
+
+    // You can define more routes directly within the '/api' group
+    $router->get('/status', function($request) {
+        echo "API Status";
+    });
 });
 ```
 
@@ -50,11 +58,8 @@ $router->group('/admin', function() use ($router) {
         echo "Welcome to Admin Dashboard!";
     })->name('admin.dashboard');
 });
-```
 
-### Resolving Named Routes
-
-```php
+// Resolving a named route
 $route = $router->route('admin.dashboard'); // Returns '/admin/dashboard'
 ```
 
@@ -83,4 +88,12 @@ if ($router->dispatch()) {
 - **route($name)**: Returns the URI associated with a named route.
 - **error()**: Returns an stdClass object with error information, if any.
 
-Feel free to expand this README with additional details such as server requirements, advanced usage examples, or any specific configurations required for your project.
+### Benefits
+
+- **Modular Routing**: Easily organize routes into groups and subgroups to maintain a structured application architecture.
+- **Flexible Routing**: Supports dynamic and static routes, closures, and controller methods.
+- **Error Handling**: Provides error handling for route dispatching failures.
+
+---
+
+This README provides a comprehensive overview of how to use the SimpleRouter class to manage routes in a PHP web application. Customize and expand upon it as needed to fit your specific project requirements, including additional configuration details, advanced usage examples, or server setup instructions.
