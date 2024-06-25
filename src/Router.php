@@ -8,8 +8,10 @@ use Closure;
 use InvalidArgumentException;
 use stdClass;
 
-class Router extends Request
+class Router
 {
+    use RouterTrait;
+
     private ?string $path = null;
     private ?string $group = null;
     private ?string $lastGroup = null;
@@ -17,6 +19,11 @@ class Router extends Request
     private array $routes = [];
     private array $names = [];
     private ?stdClass $error = null;
+
+    public function __construct(
+        private Request $request = new Request(),
+        private Response $response = new Response()
+    ) {}
 
     public function get(string $router, array|Closure $arguments): self
     {
@@ -149,6 +156,7 @@ class Router extends Request
         }
 
         $this->group = str_replace("//", "/", ($this->group .= $prefix));
+
         if ($handler instanceof Closure) {
             $handler();
         }
@@ -156,12 +164,13 @@ class Router extends Request
 
     public function dispatch(): bool
     {
-        if (! array_key_exists(strtoupper($this->request->method), $this->routes)) {
+        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRIPPED);
+        if (! array_key_exists(strtoupper($this->request->getMethod()), $this->routes)) {
             $this->handlerError("Method Not Allowed", 405);
             return false;
         }
 
-        foreach ($this->routes[strtoupper($this->request->method)] as $uri => $router) {
+        foreach ($this->routes[strtoupper($this->request->getMethod())] as $uri => $router) {
             if (! $this->uriExists($uri)) {
                 continue;
             }
@@ -177,11 +186,6 @@ class Router extends Request
     public function error(): ?stdClass
     {
         return $this->error;
-    }
-
-    public function getHeader(): ?stdClass
-    {
-        return $this->request->headers;
     }
 
     private function addRoute(string $method, string $uri, array|Closure $handler, ?string $name = null): void
@@ -236,10 +240,9 @@ class Router extends Request
             return false;
         }
 
-        (new $controller())->{$method}($this->request);
+        (new $controller())->{$method}($this->request, $this->response);
         return true;
     }
-
     private function handlerError(string $message, int $code): void
     {
         $this->error = new stdClass();
