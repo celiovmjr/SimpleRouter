@@ -29,7 +29,7 @@ class Response
 
     public function body(array|object $data): self
     {
-        $this->body = json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_NUMERIC_CHECK);
+        $this->body = json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
         $this->header('Content-Type', 'application/json');
         return $this;
     }
