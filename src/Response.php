@@ -15,13 +15,13 @@ class Response
         $this->body = '';
     }
 
-    public function setStatusCode(int $statusCode): self
+    public function status(int $statusCode): self
     {
         $this->statusCode = $statusCode;
         return $this;
     }
 
-    public function setHeader(string $header, string $value): self
+    public function header(string $header, string $value): self
     {
         $this->headers[$header] = $value;
         return $this;
@@ -29,8 +29,8 @@ class Response
 
     public function body(array|object $data): self
     {
-        $this->body = json_encode($data);
-        $this->setHeader('Content-Type', 'application/json');
+        $this->body = json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_NUMERIC_CHECK);
+        $this->header('Content-Type', 'application/json');
         return $this;
     }
 
