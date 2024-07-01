@@ -34,9 +34,12 @@ class Request
         return $this->headers;
     }
 
-    public function getBody(): ?object
+    public function getBody(bool $associative = false): null|object|array
     {
-        return $this->body;
+        if (empty($this->body)) {
+            return null;
+        }
+        return (! $associative) ? $this->body : (array) $this->body;
     }
 
     public function setBody(array|object $data): void

@@ -4,20 +4,20 @@ namespace SimpleRouter\Application;
 
 class Response
 {
-    protected int $statusCode;
-    protected array $headers;
-    protected mixed $body;
+    protected int $status = 200;
+    protected array $headers = [];
+    protected mixed $body = '';
 
     public function __construct()
     {
-        $this->statusCode = 200;
+        $this->status = 200;
         $this->headers = [];
         $this->body = '';
     }
 
-    public function status(int $statusCode): self
+    public function status(int $status): self
     {
-        $this->statusCode = $statusCode;
+        $this->status = $status;
         return $this;
     }
 
@@ -36,7 +36,7 @@ class Response
 
     public function send(): void
     {
-        http_response_code($this->statusCode);
+        http_response_code($this->status);
 
         foreach ($this->headers as $header => $value) {
             header("$header: $value");
