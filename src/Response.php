@@ -34,14 +34,11 @@ class Response
         return $this;
     }
 
-    public function send(): void
+    public function send(bool $die = false): void
     {
         http_response_code($this->status);
-
-        foreach ($this->headers as $header => $value) {
-            header("$header: $value");
-        }
-
+        foreach ($this->headers as $header => $value) header("$header: $value");
         echo $this->body;
+        if ($die) exit(1);
     }
 }
