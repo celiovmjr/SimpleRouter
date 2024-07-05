@@ -19,6 +19,7 @@ trait RouterTrait
             "letter" => preg_replace('/[^a-zA-Zà-ú\s]/', '', $element),
             "alpha" => preg_replace('/^[a-zA-ZÀ-ÖØ-öø-ÿ0-9\s]+$/i', '', $element),
             "any" => preg_replace('/(?!)^/', '', $element),
+            "uuid" => preg_replace('/[^a-fA-F0-9\-]/', '', substr($element, 0, 36)),
             default => throw new InvalidArgumentException("Invalid parameter type.")
         };
     }
