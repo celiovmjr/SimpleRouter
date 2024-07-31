@@ -52,7 +52,7 @@ class Request
     private function parseBody(array $body = []): object
     {
         $json = json_decode(file_get_contents('php://input'), true);
-        $data = array_merge($_REQUEST, $json ?? [], $body);
+        $data = array_merge($_REQUEST, $_FILES, $json ?? [], $body);
 
         foreach ($data as $key => &$value) {
             if ($key === "route") {
@@ -61,8 +61,11 @@ class Request
             }
 
             if (!is_array($value) && !is_object($value)) {
-                $value = filter_var($value, FILTER_SANITIZE_STRING);
+                $value = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+                continue;
             }
+
+            $value = (object) $value;
         }
 
         return (object) $data;
