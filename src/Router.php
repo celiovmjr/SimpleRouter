@@ -164,7 +164,7 @@ class Router
 
     public function dispatch(): bool
     {
-        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRIPPED);
+        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_SPECIAL_CHARS);
         if (! array_key_exists(strtoupper($this->request->getMethod()), $this->routes)) {
             $this->handlerError("Method Not Allowed", 405);
             return false;
