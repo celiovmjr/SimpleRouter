@@ -2,6 +2,8 @@
 
 namespace SimpleRouter\Application;
 
+use RuntimeException;
+
 class Response
 {
     protected int $status = 200;
@@ -13,6 +15,31 @@ class Response
         $this->status = 200;
         $this->headers = [];
         $this->body = '';
+    }
+
+    /**
+     * Converte todas as strings de um array/objeto para UTF-8.
+     *
+     * Converts all strings in an array/object to UTF-8.
+     */
+    private function utf8ize(mixed $data): mixed
+    {
+        if (is_array($data)) {
+            return array_map([$this, 'utf8ize'], $data);
+        }
+
+        if (is_object($data)) {
+            foreach ($data as $key => $value) {
+                $data->$key = $this->utf8ize($value);
+            }
+            return $data;
+        }
+
+        if (is_string($data)) {
+            return mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+        }
+
+        return $data;
     }
 
     public function status(int $status): self
@@ -29,7 +56,13 @@ class Response
 
     public function body(array|object $data): self
     {
-        $this->body = json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        $data = $this->utf8ize($data);
+        $this->body = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        if ($this->body === false) {
+            throw new RuntimeException('Erro ao codificar JSON: ' . json_last_error_msg());
+        }
+
         $this->header('Content-Type', 'application/json');
         return $this;
     }
