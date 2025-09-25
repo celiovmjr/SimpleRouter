@@ -34,6 +34,11 @@ class Request
         return $this->headers;
     }
 
+    public function header(string $key): int|string|null
+    {
+        return ! empty($this->headers->$key) ? $this->headers->$key : null;
+    }
+
     public function getBody(bool $associative = false): null|object|array
     {
         if (empty($this->body)) {
